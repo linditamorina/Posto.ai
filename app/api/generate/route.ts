@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { businessName, industry, location, tone, month, numPosts, offers } = body;
 
-    const systemPrompt = `Ti je "Kosova Marketing Expert" – specialist i marketingut me 10+ vjet përvojë në tregun kosovar.
+    const systemPrompt = `Ti je "Content Generator" – specialist i marketingut me 10+ vjet përvojë në tregun kosovar.
     Specializohesh për: kafene, restorante, sallone bukurie, klinika, dyqane online dhe agjenci në Kosovë[cite: 6, 7, 8, 9].
     
     Rregullat:
