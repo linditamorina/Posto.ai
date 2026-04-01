@@ -94,10 +94,31 @@ export default function Dashboard() {
   };
 
   const calendarEvents: MyCalendarEvent[] = [];
+  
   recentPosts.forEach((batch) => {
-    const baseDate = batch.start_date ? moment(batch.start_date) : moment(batch.created_at);
-    batch.content?.posts?.forEach((post: any, index: number) => {
-      const eventDate = moment(baseDate).add(index, 'days').toDate();
+    const startDate = batch.start_date ? moment(batch.start_date) : moment(batch.created_at);
+    // Nëse nuk ka end_date, llogarisim si default 7 ditë (ose mund të ndryshojmë sipas dëshirës)
+    const endDate = batch.end_date ? moment(batch.end_date) : moment(startDate).add(7, 'days');
+    
+    const diffDays = moment(endDate).diff(moment(startDate), 'days');
+    const postsArray = batch.content?.posts || [];
+    const totalPosts = postsArray.length;
+
+    postsArray.forEach((post: any, index: number) => {
+      let eventDate;
+
+      if (diffDays > totalPosts && totalPosts > 0) {
+        // FORMULA 2: Ndarja e ditëve në "blloqe" dhe caktimi i një date random brenda bllokut
+        const step = Math.floor(diffDays / totalPosts);
+        const randomOffsetInStep = Math.floor(Math.random() * step);
+        const finalOffset = (index * step) + randomOffsetInStep;
+        
+        eventDate = moment(startDate).add(finalOffset, 'days').toDate();
+      } else {
+        // Rasti normal, njera pas tjetres nese koha eshte e vogel
+        eventDate = moment(startDate).add(index, 'days').toDate();
+      }
+
       calendarEvents.push({
         id: batch.id,
         title: post.hook || "Social Post",
@@ -141,6 +162,7 @@ export default function Dashboard() {
             <button onClick={() => router.push('/generate')} className="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-[0_10px_20px_rgba(5,150,105,0.3)] transition-all hover:-translate-y-1">✨ Krijo Postime</button>
             <button onClick={() => router.push('/favorites')} className="w-full py-4 bg-slate-800 text-slate-400 border border-slate-700 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all hover:text-white hover:-translate-y-1">★ Vault</button>
             <button onClick={() => router.push('/vision')} className="w-full py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_10px_20px_rgba(124,58,237,0.3)] border border-white/10 flex items-center justify-center gap-3 group transition-all hover:-translate-y-1"><span className="text-sm group-hover:rotate-12 transition-transform">📸</span>Image to Text</button>
+            <button onClick={() => router.push('/text-to-image')} className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-[0_10px_20px_rgba(245,158,11,0.3)] border border-white/10 flex items-center justify-center gap-3 group transition-all hover:-translate-y-1"><span className="text-sm group-hover:scale-125 transition-transform">🎨</span>Text to Image</button>
           </nav>
         </div>
         
