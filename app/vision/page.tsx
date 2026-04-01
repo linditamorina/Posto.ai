@@ -13,212 +13,235 @@ export default function VisionPage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [businessName, setBusinessName] = useState("");
   const [location, setLocation] = useState("Mitrovicë");
+  const [businessDescription, setBusinessDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [marketingPost, setMarketingPost] = useState<any>(null);
   const [createPostLoading, setCreatePostLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Kontrolli i madhësisë (Max 4MB për të shmangur 413 error)
-      if (file.size > 4 * 1024 * 1024) {
-        alert("Fotoja është shumë e madhe. Ju lutem zgjidhni një foto nën 4MB.");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => setSelectedImage(reader.result as string);
-      reader.readAsDataURL(file);
-    }
-  };
-
   const analyzeImage = async () => {
     if (!selectedImage) return;
     setLoading(true);
     try {
-      // NDRYSHIMI KRYESOR: Thërrasim /api/generate nëse aty e ke route-in
-      // Nëse e ke krijuar specifikisht app/api/vision/route.ts, sigurohu që emri i folderit është i saktë.
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          selectedImage, 
-          businessName, 
+        body: JSON.stringify({
+          selectedImage,
+          businessName,
           location,
-          industry: "General", // Default për vision
-          numPosts: 1, 
-          tone: "Friendly/Local",
-          language: "sq" 
+          businessDescription,
+          industry: "Retail/Market",
+          numPosts: 1,
+          tone: "Professional & Modern",
+          language: "sq"
         }),
       });
 
-      if (!res.ok) {
-        const errorData = await res.text();
-        console.error("Server Error:", errorData);
-        throw new Error(`Gabim nga serveri: ${res.status}`);
-      }
-
       const responseData = await res.json();
-      
-      // Përshtatja me strukturën e JSON që kthen Llama
-      if (responseData.data && responseData.data.posts) {
+      if (responseData.data?.posts) {
         setMarketingPost(responseData.data.posts[0]);
-      } else {
-        throw new Error("Struktura e të dhënave nuk është e saktë.");
       }
-      
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Analizimi dështoi.");
+    } catch (err) {
+      console.error("Analysis Error:", err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleSavePost = async () => {
-  if (!marketingPost || !user) return;
-  setCreatePostLoading(true);
-  try {
-    const payload = {
-      business_name: businessName || "AI Vision Business",
-      content: { posts: [marketingPost] }, // Ruajmë postimin brenda array-it content
-      user_id: user?.id,
-      start_date: moment().format("YYYY-MM-DD"),
-      location: location,
-      reference_image: selectedImage,
-      is_favorite: true,
-    };
-
-    const { error } = await supabase.from("posts").insert([payload]);
-
-    if (error) throw error;
-
-    // SHFAQ NJOFTIMIN
-    setShowToast(true);
-    
-    // HIQE NJOFTIMIN PAS 3 SEKONDAVE
-    setTimeout(() => setShowToast(false), 3000);
-
-  } catch (err) {
-    console.error(err);
-    alert("Gabim gjatë ruajtjes.");
-  } finally {
-    setCreatePostLoading(false);
-  }
-};
+    if (!marketingPost || !user) return;
+    setCreatePostLoading(true);
+    try {
+      const { error } = await supabase.from("posts").insert([{
+        business_name: businessName || "Vision AI",
+        content: { posts: [marketingPost] },
+        user_id: user?.id,
+        start_date: moment().format("YYYY-MM-DD"),
+        location: location,
+        reference_image: selectedImage,
+        is_favorite: true,
+      }]);
+      if (error) throw error;
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (err) {
+      console.error("Save Error:", err);
+    } finally {
+      setCreatePostLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-8 md:p-12 font-sans">
-      <div className="max-w-4xl mx-auto space-y-10">
-        
-        <div className="flex justify-between items-center border-b border-slate-800 pb-8">
-          <div>
-            <p className="text-pink-500 font-black text-[10px] uppercase tracking-[0.5em] mb-2 italic">IMAGE INTELLIGENCE</p>
-            <h1 className="text-4xl font-black tracking-tighter uppercase italic">Vision AI</h1>
-          </div>
-          <button onClick={() => router.push("/")} className="px-6 py-3 bg-slate-800 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-700 transition-all cursor-pointer">🏠 Back</button>
-        </div>
+    <div className="min-h-screen bg-[#0B0F1A] text-slate-200 p-4 sm:p-6 md:p-10 font-sans selection:bg-indigo-500/30">
+      
+      {/* Subtle Background Elements */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-indigo-600/10 blur-[120px] pointer-events-none"></div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          <div className="space-y-6">
-            <div className="bg-slate-900/50 p-6 rounded-[30px] border border-slate-800 space-y-4">
-              <div>
-                <label className="text-[10px] font-black text-slate-500 uppercase block mb-2 pl-1">Business Name</label>
-                <input 
-                  className="w-full bg-slate-800 border-2 border-slate-700 p-4 rounded-2xl outline-none focus:border-pink-500 text-sm font-bold transition-all" 
-                  placeholder="Emri i biznesit..."
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                />
+      <div className="max-w-7xl mx-auto space-y-8 md:space-y-12 relative z-10">
+        
+        {/* Header - Minimal & Consistent */}
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800/50 pb-8 gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-500/20">
+              <span className="text-white font-black text-xl italic">V</span>
+            </div>
+            <div>
+              <h1 className="text-2xl font-black tracking-tight text-white uppercase italic">Vision AI</h1>
+              <p className="text-[10px] font-bold text-slate-500 tracking-[0.3em] uppercase">Neural Marketing</p>
+            </div>
+          </div>
+          <button onClick={() => router.push("/")} className="w-full sm:w-auto px-6 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+            🏠 Home
+          </button>
+        </header>
+
+        <main className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          
+          {/* Left Side: Parameters */}
+          <section className="lg:col-span-5 space-y-6">
+            <div className="bg-[#111827]/50 backdrop-blur-xl border border-slate-800/60 p-6 sm:p-8 rounded-[2.5rem] shadow-2xl space-y-6">
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Identity</label>
+                  <input 
+                    className="w-full bg-[#0B0F1A] border border-slate-800 p-4 rounded-2xl outline-none focus:border-indigo-500/50 text-sm font-bold transition-all placeholder:text-slate-700" 
+                    placeholder="Business Name" 
+                    value={businessName} 
+                    onChange={e => setBusinessName(e.target.value)} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Region</label>
+                  <input 
+                    className="w-full bg-[#0B0F1A] border border-slate-800 p-4 rounded-2xl outline-none focus:border-indigo-500/50 text-sm font-bold transition-all placeholder:text-slate-700" 
+                    placeholder="Mitrovicë" 
+                    value={location} 
+                    onChange={e => setLocation(e.target.value)} 
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="text-[10px] font-black text-slate-500 uppercase block mb-2 pl-1">Location (City)</label>
-                <input 
-                  className="w-full bg-slate-800 border-2 border-slate-700 p-4 rounded-2xl outline-none focus:border-pink-500 text-sm font-bold transition-all" 
-                  placeholder="P.sh. Mitrovicë, Prishtinë..."
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Context Analysis</label>
+                <textarea 
+                  className="w-full bg-[#0B0F1A] border border-slate-800 p-4 rounded-2xl outline-none focus:border-indigo-500/50 text-sm font-bold transition-all min-h-[120px] resize-none placeholder:text-slate-700" 
+                  placeholder="What are we promoting? (Albanian or English)" 
+                  value={businessDescription} 
+                  onChange={e => setBusinessDescription(e.target.value)} 
                 />
               </div>
 
               <div 
                 onClick={() => fileInputRef.current?.click()}
-                className={`h-48 rounded-[30px] border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all ${selectedImage ? 'border-pink-500 bg-pink-500/5' : 'border-slate-800 hover:border-pink-500/50'}`}
+                className={`relative h-56 rounded-[2rem] border-2 border-dashed flex items-center justify-center cursor-pointer transition-all duration-500 overflow-hidden ${selectedImage ? 'border-indigo-500/50 bg-indigo-500/5' : 'border-slate-800 hover:border-indigo-500/30'}`}
               >
                 {selectedImage ? (
-                  <img src={selectedImage} className="h-full w-full object-cover rounded-[28px]" alt="Selected" />
+                  <img src={selectedImage} className="w-full h-full object-cover" alt="Visual Reference" />
                 ) : (
                   <div className="text-center">
-                    <span className="text-3xl block mb-2">📸</span>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Upload Reference Image</p>
+                    <span className="text-3xl block mb-2 opacity-50">🖼️</span>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">Visual Input Required</p>
                   </div>
                 )}
-                <input type="file" hidden ref={fileInputRef} onChange={handleImageChange} accept="image/*" />
+                <input type="file" hidden ref={fileInputRef} onChange={e => {
+                  const file = e.target.files?.[0];
+                  if(file) {
+                    const r = new FileReader();
+                    r.onload = () => setSelectedImage(r.result as string);
+                    r.readAsDataURL(file);
+                  }
+                }} accept="image/*" />
               </div>
 
               <button 
                 onClick={analyzeImage}
-                disabled={!selectedImage || loading}
-                className="w-full py-5 bg-gradient-to-r from-pink-600 to-rose-600 rounded-[20px] font-black uppercase text-[11px] tracking-[0.2em] shadow-xl hover:-translate-y-1 transition-all disabled:opacity-50 cursor-pointer"
+                disabled={loading || !selectedImage}
+                className="w-full py-5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30 text-white rounded-[1.8rem] font-black text-[11px] uppercase tracking-[0.3em] transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
               >
-                {loading ? "Analyzing..." : "Analyze with AI ✨"}
+                {loading ? "Processing Intelligence..." : "Execute Vision ✨"}
               </button>
             </div>
-          </div>
+          </section>
 
-          <div className="relative">
+          {/* Right Side: Output */}
+          <section className="lg:col-span-7">
             {marketingPost ? (
-              <div className="bg-white text-slate-900 p-8 rounded-[40px] shadow-[0_20px_60px_rgba(255,255,255,0.05)] space-y-6 animate-result">
-                <div className="flex justify-between items-start">
-                  <span className="bg-pink-100 text-pink-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest italic">AI Draft</span>
-                  <span className="text-[10px] font-bold text-slate-400">📍 {location}</span>
+              <div className="bg-[#111827]/30 border border-slate-800/60 p-8 md:p-12 rounded-[3rem] space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-700 shadow-2xl">
+                <div className="flex justify-between items-center px-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-400">Analysis Result</span>
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-500 italic px-4 py-1.5 bg-slate-900 rounded-full border border-slate-800">📍 {location}</span>
                 </div>
-                
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-black tracking-tight leading-tight">{marketingPost.hook}</h3>
-                  <p className="text-sm font-medium leading-relaxed text-slate-600">{marketingPost.caption}</p>
-                  <div className="pt-4 border-t border-slate-100">
-                    <p className="text-[10px] font-black text-pink-500 uppercase tracking-widest mb-2">Hashtags</p>
-                    <p className="text-xs font-bold text-indigo-600">{marketingPost.hashtags}</p>
+
+                <div className="space-y-10">
+                  <div className="group">
+                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest block mb-4 group-hover:text-indigo-400 transition-colors">Headline Hook</span>
+                    <h2 className="text-3xl md:text-4xl font-black text-white leading-tight italic tracking-tighter uppercase">
+                      "{marketingPost?.hook}"
+                    </h2>
+                  </div>
+
+                  <div className="relative group">
+                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest block mb-4 group-hover:text-indigo-400 transition-colors">Semantic Content</span>
+                    <div className="bg-[#0B0F1A]/80 border border-slate-800/40 p-8 rounded-[2.5rem] relative z-10">
+                      <p className="text-lg font-medium leading-relaxed text-slate-300 italic">
+                        {marketingPost?.caption}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-8 border-t border-slate-800/50">
+                    <div className="flex flex-wrap gap-2">
+                      {marketingPost?.hashtags?.split(' ').filter(Boolean).map((tag: string, i: number) => (
+                        <span key={i} className="text-[10px] font-black text-indigo-400 bg-indigo-500/5 px-4 py-2 rounded-xl border border-indigo-500/20 uppercase tracking-tighter">
+                          #{tag.replace('#', '')}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
                 <button 
                   onClick={handleSavePost}
                   disabled={createPostLoading}
-                  className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-black transition-all cursor-pointer shadow-lg"
+                  className="w-full py-5 bg-white text-black hover:bg-slate-200 rounded-[2rem] font-black uppercase text-[11px] tracking-[0.3em] transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3"
                 >
-                  {createPostLoading ? "Saving..." : "Save to Vault 🔒"}
+                  {createPostLoading ? "Syncing..." : (
+                    <>
+                      <span>Secure to Vault</span>
+                      <span className="text-lg">🔒</span>
+                    </>
+                  )}
                 </button>
               </div>
             ) : (
-              <div className="h-full border-2 border-slate-900 border-dashed rounded-[40px] flex items-center justify-center p-12 text-center">
-                <p className="text-slate-700 font-black uppercase tracking-widest text-xs leading-loose">
-                  Waiting for analysis...<br/>Results will appear here.
+              <div className="h-full min-h-[500px] border border-slate-800 border-dashed rounded-[3rem] flex flex-col items-center justify-center p-12 text-center bg-slate-900/10">
+                <div className="w-20 h-20 bg-slate-900/50 rounded-full flex items-center justify-center mb-6 border border-slate-800/50">
+                  <span className="text-4xl grayscale opacity-20">⚡</span>
+                </div>
+                <p className="text-slate-600 font-black uppercase tracking-[0.4em] text-[10px] leading-loose">
+                  Neural Sync Pending<br/>
+                  <span className="text-slate-800 text-[8px] font-medium lowercase italic">Provide reference data to begin analysis</span>
                 </p>
               </div>
             )}
-          </div>
-        </div>
+          </section>
+        </main>
       </div>
 
-      <style jsx global>{`
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-result { animation: slideUp 0.6s ease-out forwards; }
-      `}</style>
-
-      {/* TOAST NOTIFICATION */}
-        {showToast && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 animate-bounce">
-            <div className="bg-emerald-500 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-[0_20px_40px_rgba(16,185,129,0.3)] flex items-center gap-3">
-            <span>✅</span> U ruajt me sukses në Vault!
-            </div>
+      {/* TOAST */}
+      {showToast && (
+        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-8 duration-500">
+          <div className="bg-white text-black px-10 py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.3em] shadow-2xl flex items-center gap-4">
+            <span className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[10px]">✓</span>
+            Asset Secured
+          </div>
         </div>
-        )}
+      )}
     </div>
   );
 }
