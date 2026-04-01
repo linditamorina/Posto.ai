@@ -44,7 +44,6 @@ export default function Dashboard() {
   const [selectedDayEvents, setSelectedDayEvents] = useState<MyCalendarEvent[] | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{id: string, name: string} | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -139,31 +138,38 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col md:flex-row h-screen bg-slate-950 text-slate-200 font-sans relative overflow-hidden">
       
-      <div className="md:hidden flex items-center justify-between p-5 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 z-30 shrink-0">
+      {/* --- MOBILE HEADER (Fixed Top) --- */}
+      <div className="md:hidden flex items-center justify-between p-5 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 z-[60] shrink-0">
         <h1 className="text-xl font-black text-white uppercase italic tracking-tighter flex items-center gap-2">
           <span className="bg-indigo-600 text-white px-2 py-0.5 rounded-lg not-italic text-[10px] shadow-[0_0_15px_rgba(79,70,229,0.5)]">P.ai</span> 
           Posto.ai
         </h1>
-        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white hover:text-indigo-400 transition-colors p-2">
+        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-white hover:text-indigo-400 transition-colors p-2 text-2xl">
           {isMobileMenuOpen ? "✕" : "☰"}
         </button>
       </div>
 
+      {/* --- MOBILE OVERLAY --- */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[70] md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
       )}
 
-      <aside className={`absolute md:relative z-50 top-0 left-0 h-full w-[280px] md:w-[320px] bg-slate-900/95 md:bg-slate-900/50 border-r border-slate-800/50 flex flex-col shadow-[25px_0_50px_rgba(0,0,0,0.4)] shrink-0 transition-transform duration-300 backdrop-blur-xl md:backdrop-blur-md ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
-        <div className="p-6 md:p-8 border-b border-slate-800/50 bg-slate-900/30 text-center flex justify-between md:justify-center items-center">
+      {/* --- SIDEBAR NAVIGATION --- */}
+      <aside className={`fixed md:relative z-[80] top-0 left-0 h-full w-[280px] md:w-[320px] bg-slate-900 md:bg-slate-900/50 border-r border-slate-800/50 flex flex-col shadow-[25px_0_50px_rgba(0,0,0,0.4)] shrink-0 transition-transform duration-300 backdrop-blur-xl md:backdrop-blur-md ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        
+        {/* Sidebar Header */}
+        <div className="p-6 md:p-8 border-b border-slate-800/50 bg-slate-900/30 flex justify-between items-center shrink-0">
           <h1 className="text-xl md:text-2xl font-black text-white uppercase italic tracking-tighter flex items-center justify-center gap-2">
             <span className="bg-indigo-600 text-white px-2.5 py-1 rounded-xl not-italic text-xs shadow-[0_0_20px_rgba(79,70,229,0.5)]">P.ai</span> 
             Posto.ai
           </h1>
-          <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-slate-400 hover:text-white p-2">✕</button>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 md:space-y-8 no-scrollbar flex flex-col">
-          <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 bg-slate-800/40 rounded-[20px] md:rounded-3xl border border-slate-700/50 shadow-inner">
+        {/* Sidebar Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 no-scrollbar flex flex-col">
+          {/* User Profile */}
+          <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 bg-slate-800/40 rounded-[20px] border border-slate-700/50 shadow-inner">
             <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-black text-xs md:text-sm shrink-0">
               {user.email?.charAt(0).toUpperCase()}
             </div>
@@ -173,20 +179,26 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <nav className="flex flex-col gap-2 md:gap-3">
-            <button onClick={() => router.push('/generate')} className="w-full py-3 md:py-4 bg-emerald-600 text-white rounded-[14px] md:rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-widest transition-all hover:-translate-y-1">✨ Krijo Postime</button>
-            <button onClick={() => router.push('/favorites')} className="w-full py-3 md:py-4 bg-slate-800 text-slate-400 border border-slate-700 rounded-[14px] md:rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-widest transition-all hover:text-white hover:-translate-y-1">★ Vault</button>
-            <button onClick={() => router.push('/vision')} className="w-full py-3 md:py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-[14px] md:rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 group transition-all hover:-translate-y-1">📸 Image to Text</button>
-            <button onClick={() => router.push('/text-to-image')} className="w-full py-3 md:py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-[14px] md:rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 group transition-all hover:-translate-y-1">🎨 Text to Image</button>
+          {/* Nav Buttons */}
+          <nav className="flex flex-col gap-2.5">
+            <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] ml-2 mb-1">Navigation</p>
+            <button onClick={() => { router.push('/generate'); setIsMobileMenuOpen(false); }} className="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-black text-[9px] uppercase tracking-widest transition-all hover:-translate-y-1">✨ CREATE POSTS</button>
+            <button onClick={() => { router.push('/favorites'); setIsMobileMenuOpen(false); }} className="w-full py-3.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all hover:text-white">★ VAULT</button>
+            
+            <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] ml-2 mt-4 mb-1">AI Intelligence</p>
+            <button onClick={() => { router.push('/vision'); setIsMobileMenuOpen(false); }} className="w-full py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl font-black text-[9px] uppercase tracking-[0.2em] transition-all">📸 IMAGE TO TEXT</button>
+            <button onClick={() => { router.push('/text-to-image'); setIsMobileMenuOpen(false); }} className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-black text-[9px] uppercase tracking-[0.2em] transition-all">🎨 TEXT TO IMAGE</button>
           </nav>
-        </div>
-        
-        <div className="p-6 md:p-8 border-t border-slate-800/50 bg-slate-900/40 mt-auto">
-          <button onClick={handleLogout} className="w-full py-3 md:py-4 bg-red-500/5 border border-red-500/10 rounded-[14px] md:rounded-2xl text-[9px] md:text-[10px] font-black text-red-500 uppercase tracking-[0.3em] hover:bg-red-500 hover:text-white transition-all italic flex items-center justify-center gap-2">Logout 👋</button>
+
+          {/* Logout Section - Locked to bottom of scroll area */}
+          <div className="pt-6 mt-auto">
+            <button onClick={handleLogout} className="w-full py-3.5 bg-red-500/5 border border-red-500/10 rounded-xl text-[9px] font-black text-red-500 uppercase tracking-[0.3em] hover:bg-red-500 hover:text-white transition-all italic flex items-center justify-center gap-2">LOGOUT 👋</button>
+          </div>
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto p-4 sm:p-8 md:p-12 bg-slate-950 h-full w-full relative z-10 no-scrollbar">
+      {/* --- MAIN CONTENT --- */}
+      <main className="flex-1 overflow-y-auto p-4 sm:p-8 md:p-12 bg-slate-950 h-full w-full relative z-10 no-scrollbar pt-24 md:pt-12">
         <div className="max-w-5xl mx-auto space-y-8 md:space-y-12">
           
           <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-800/50 pb-6 md:pb-8 gap-4">
@@ -196,6 +208,7 @@ export default function Dashboard() {
               </div>
           </header>
           
+          {/* Metrics Section */}
           <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
             <div className="lg:col-span-2 bg-slate-900/50 border border-slate-800/50 p-6 md:p-10 rounded-[30px] md:rounded-[45px] shadow-2xl flex flex-col h-[300px] md:h-[380px] backdrop-blur-sm">
               <div className="flex justify-between items-center mb-6 md:mb-8 shrink-0">
@@ -224,10 +237,11 @@ export default function Dashboard() {
             </div>
           </section>
 
+          {/* Calendar Section */}
           <section className="bg-slate-900/50 border border-slate-800/50 p-4 sm:p-6 md:p-8 rounded-[30px] md:rounded-[40px] backdrop-blur-sm shadow-2xl overflow-hidden min-h-[500px] md:min-h-[650px] flex flex-col">
             <div className="flex justify-between items-center mb-4 md:mb-6 px-2 shrink-0">
               <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-slate-500">
-                Marketing Calendar
+                MARKETING CALENDAR
               </h3>
             </div>
             <div className="flex-1 min-h-[400px] md:min-h-[500px]">
@@ -253,11 +267,13 @@ export default function Dashboard() {
             </div>
         </section>
 
+          {/* Recent Intelligence List */}
           <section className="pt-4 md:pt-6 pb-10 md:pb-20">
               <div className="flex justify-between items-center mb-6 md:mb-8 px-2 md:px-4">
                   <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-slate-500 border-b-2 md:border-b-4 border-indigo-900/30 pb-2">Recent Intelligence</h3>
               </div>
 
+              {/* Desktop View */}
               <div className="hidden md:block bg-slate-900/50 rounded-[40px] border border-slate-800/50 shadow-2xl overflow-hidden backdrop-blur-sm">
                   <div className="grid grid-cols-5 p-7 bg-slate-900 border-b border-slate-800 font-black text-slate-500 uppercase text-[10px] tracking-widest text-center">
                       <div className="text-left pl-6">Client</div>
@@ -287,6 +303,7 @@ export default function Dashboard() {
                   </div>
               </div>
 
+              {/* Mobile View */}
               <div className="md:hidden space-y-4">
                   {recentPosts.map((post) => (
                       <div key={post.id} className="bg-slate-900/60 border border-slate-800 p-5 rounded-[25px] space-y-4 shadow-xl">
@@ -302,7 +319,7 @@ export default function Dashboard() {
                           <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-800/50">
                               <div>
                                   <p className="text-[9px] font-black text-slate-500 uppercase mb-1">Scheduled</p>
-                                  <p className="text-xs font-bold text-slate-300">{post.start_date ? moment(post.start_date).format('DD MMM, YYYY') : 'Jo caktuar'}</p>
+                                  <p className="text-xs font-bold text-slate-300">{post.start_date ? moment(post.start_date).format('DD MMM, YYYY') : 'Not Set'}</p>
                               </div>
                               <div className="flex flex-col items-end">
                                   <p className="text-[9px] font-black text-slate-500 uppercase mb-1 text-right">Documents</p>
@@ -320,7 +337,7 @@ export default function Dashboard() {
         </div>
       </main>
 
-      {/* DAILY SCHEDULE MODAL - RESPONSIVE IMPROVED */}
+      {/* --- DAILY SCHEDULE MODAL --- */}
       {selectedDayEvents && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
           <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-xl" onClick={() => setSelectedDayEvents(null)}></div>
@@ -336,12 +353,11 @@ export default function Dashboard() {
             </div>
             
             <div className="flex-1 overflow-y-auto p-4 md:p-6 no-scrollbar">
-              {/* DESKTOP TABLE */}
               <div className="hidden md:block">
                 <table className="w-full text-left border-separate border-spacing-y-2">
                   <thead className="text-[10px] font-black uppercase text-slate-500">
                     <tr>
-                      <th className="px-6 py-2">Business</th>
+                      <th className="px-6 py-2">Client</th>
                       <th className="px-6 py-2">Hook/Title</th>
                       <th className="px-6 py-2 text-center">PDF</th>
                       <th className="px-6 py-2 text-right">Action</th>
@@ -362,13 +378,12 @@ export default function Dashboard() {
                 </table>
               </div>
 
-              {/* MOBILE CARDS */}
               <div className="md:hidden space-y-4">
                 {selectedDayEvents.map((ev, idx) => (
                   <div key={idx} className="bg-slate-800/30 border border-slate-700/50 p-5 rounded-[25px] space-y-4">
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-1">Business</p>
+                        <p className="text-[9px] font-black text-indigo-500 uppercase tracking-widest mb-1">Client</p>
                         <h4 className="text-lg font-black text-white italic tracking-tighter">{ev.business}</h4>
                       </div>
                       <div className="scale-90"><PdfButton post={ev.fullData} /></div>
@@ -377,7 +392,7 @@ export default function Dashboard() {
                       <p className="text-[9px] font-black text-slate-500 uppercase mb-1">Hook</p>
                       <p className="text-xs font-bold text-slate-300 leading-relaxed line-clamp-2">{ev.title}</p>
                     </div>
-                    <button onClick={() => router.push(`/generations/${ev.id}`)} className="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg active:scale-95 transition-all">Hape Postimin</button>
+                    <button onClick={() => router.push(`/generations/${ev.id}`)} className="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg active:scale-95 transition-all">Open Post</button>
                   </div>
                 ))}
               </div>
@@ -386,6 +401,7 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* --- DELETE CONFIRMATION MODAL --- */}
       {deleteTarget && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 md:p-6">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setDeleteTarget(null)}></div>
@@ -395,20 +411,21 @@ export default function Dashboard() {
                 <span className="text-2xl md:text-3xl">⚠️</span>
               </div>
               <div>
-                <h3 className="text-white font-black uppercase italic tracking-tighter text-xl md:text-2xl mb-2">Konfirmo Fshirjen</h3>
+                <h3 className="text-white font-black uppercase italic tracking-tighter text-xl md:text-2xl mb-2">Confirm Delete</h3>
                 <p className="text-slate-400 text-xs md:text-sm font-medium px-2 md:px-4">
-                  A jeni të sigurt që dëshironi të fshini strategjinë për <span className="text-white font-black italic">"{deleteTarget.name}"</span>?
+                  Are you sure you want to delete the strategy for <span className="text-white font-black italic">"{deleteTarget.name}"</span>?
                 </p>
               </div>
               <div className="flex flex-col gap-2 md:gap-3 pt-4">
-                <button onClick={confirmDelete} className="w-full py-3 md:py-4 bg-red-600 text-white rounded-[14px] md:rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] shadow-[0_10px_20_rgba(220,38,38,0.3)] hover:bg-red-500 transition-all cursor-pointer">Po, Fshije</button>
-                <button onClick={() => setDeleteTarget(null)} className="w-full py-3 md:py-4 bg-slate-800 text-slate-400 border border-slate-700 rounded-[14px] md:rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] hover:text-white transition-all cursor-pointer">Anulo</button>
+                <button onClick={confirmDelete} className="w-full py-3 md:py-4 bg-red-600 text-white rounded-xl md:rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] shadow-[0_10px_20_rgba(220,38,38,0.3)] hover:bg-red-500 transition-all cursor-pointer">Yes, Delete</button>
+                <button onClick={() => setDeleteTarget(null)} className="w-full py-3 md:py-4 bg-slate-800 text-slate-400 border border-slate-700 rounded-xl md:rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] hover:text-white transition-all cursor-pointer">Cancel</button>
               </div>
             </div>
           </div>
         </div>
       )}
 
+      {/* --- GLOBAL STYLES --- */}
       <style jsx global>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
