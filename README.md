@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 AI Content Generator - Posto.AI
 
-## Getting Started
+Ky është një aplikacion modern i ndërtuar me **Next.js 14**, i cili ndihmon bizneset të gjenerojnë strategji përmbajtjeje dhe postime për rrjetet sociale duke përdorur Inteligjencën Artificiale.
 
-First, run the development server:
+## 🔗 Linku Live (Vercel)
+Kliko butonin më poshtë për të vizituar aplikacionin:
+👉 **[Vizito Aplikacionin Live](https://posto-ai-nine.vercel.app/)**
 
-```bash
+---
+
+## ✨ Karakteristikat Kryesore
+* **Gjenerimi me AI:** Krijimi i postimeve automatike bazuar në emrin e biznesit, industrinë dhe tonin e zërit.
+* **Sistemi i Autentikimit:** Logimi i sigurt përmes Supabase Auth.
+* **Vault (Të preferuarat):** Ruajtja e strategjive më të mira në një arkivë personale.
+* **Eksportimi në PDF:** Mundësia për të shkarkuar planet e përmbajtjes si dokumente PDF.
+* **Dizajni Responsive:** UI i optimizuar për Mobile, Tablet dhe Desktop me një estetikë "Modern Dark".
+
+## 🛠 Teknologjitë e Përdorura
+* **Framework:** [Next.js](https://nextjs.org/) (App Router)
+* **Stilimi:** [Tailwind CSS](https://tailwindcss.com/)
+* **Database & Auth:** [Supabase](https://supabase.com/)
+* **AI SDK:** Vercel AI SDK / OpenAI
+* **Deployment:** [Vercel](https://vercel.com/)
+* **Librari të tjera:** Moment.js, Framer Motion (nëse e ke përdorur), Lucide React.
+
+## 🚀 Si të ekzekutohet lokalisht
+
+1. Klono projektin:
+   ```bash
+   git clone (https://github.com/linditamorina/Posto.ai)
+Instalo dependecies:
+
+Bash
+npm install
+Konfiguro .env.local me çelësat e Supabase dhe OpenAI:
+
+Code snippet
+NEXT_PUBLIC_SUPABASE_URL=lidhja_juaj
+NEXT_PUBLIC_SUPABASE_ANON_KEY=celes_juaj
+OPENAI_API_KEY=celes_juaj
+Starto serverin:
+
+Bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+👤 Autori
+Lindita Morina
