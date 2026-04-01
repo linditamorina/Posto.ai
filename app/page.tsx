@@ -240,7 +240,6 @@ export default function Dashboard() {
                 onNavigate={(newDate) => setCalendarDate(newDate)}
                 className="custom-calendar-style"
                 views={['month']}
-                dayMaxEventRows={2}
                 onSelectEvent={(event) => router.push(`/generations/${event.id}`)}
                 onShowMore={(events) => setSelectedDayEvents(events as MyCalendarEvent[])}
                 components={{
