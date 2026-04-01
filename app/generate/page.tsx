@@ -14,6 +14,7 @@ export default function GeneratePage() {
     businessName: "", 
     industry: "", 
     location: "Mitrovicë",
+    businessDescription: "", // E shtuar rishtas
     month: new Date().toLocaleString('sq-AL', { month: 'long' }),
     offers: "" 
   });
@@ -31,7 +32,11 @@ export default function GeneratePage() {
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
 
-  const isFormReady = formData.businessName.trim() !== "" && formData.industry.trim() !== "";
+  // Validimi: Tani kërkon edhe përshkrimin e biznesit
+  const isFormReady = 
+    formData.businessName.trim() !== "" && 
+    formData.industry.trim() !== "" && 
+    formData.businessDescription.trim() !== "";
 
   const tones = [
     { label: "Professional", icon: "💼" },
@@ -160,6 +165,17 @@ export default function GeneratePage() {
               <input className="w-full bg-slate-800/50 border-2 border-slate-700/30 p-3.5 md:p-4 rounded-xl md:rounded-2xl outline-none focus:border-indigo-500 text-xs font-bold text-white transition-all shadow-inner" placeholder="P.sh. Gastronomi" value={formData.industry} onChange={e => setFormData({...formData, industry: e.target.value})} />
             </div>
 
+            {/* FUSHA E RE: Business Description */}
+            <div className="group">
+              <label className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase pl-1 mb-1.5 block">Business Description *</label>
+              <textarea 
+                className="w-full bg-slate-800/50 border-2 border-slate-700/30 p-3.5 md:p-4 rounded-xl md:rounded-2xl outline-none focus:border-indigo-500 text-xs font-bold text-white transition-all shadow-inner min-h-[110px] resize-none" 
+                placeholder="Përshkruaj çfarë dëshiron të reklamojmë (p.sh. Oferta e fundjavës për macchiato)..." 
+                value={formData.businessDescription} 
+                onChange={e => setFormData({...formData, businessDescription: e.target.value})} 
+              />
+            </div>
+
             <div className="group">
               <label className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase pl-1 mb-1.5 block">Location (City)</label>
               <input className="w-full bg-slate-800/50 border-2 border-slate-700/30 p-3.5 md:p-4 rounded-xl md:rounded-2xl outline-none focus:border-indigo-500 text-xs font-bold text-white transition-all shadow-inner" placeholder="P.sh. Mitrovicë" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} />
@@ -212,7 +228,11 @@ export default function GeneratePage() {
               </div>
             </div>
 
-            <button onClick={handleGenerate} disabled={!isFormReady || loading} className={`w-full p-4 md:p-5 mt-2 md:mt-4 rounded-xl md:rounded-2xl font-black uppercase text-[10px] md:text-[12px] tracking-[0.2em] md:tracking-[0.3em] transition-all duration-300 ${isFormReady && !loading ? "bg-emerald-500 text-white shadow-[0_10px_20px_rgba(16,185,129,0.4)] hover:bg-emerald-400 hover:-translate-y-1 active:scale-95 cursor-pointer" : "bg-slate-800 text-slate-600 cursor-not-allowed border-2 border-dashed border-slate-700"}`}>
+            <button 
+              onClick={handleGenerate} 
+              disabled={!isFormReady || loading} 
+              className={`w-full p-4 md:p-5 mt-2 md:mt-4 rounded-xl md:rounded-2xl font-black uppercase text-[10px] md:text-[12px] tracking-[0.2em] md:tracking-[0.3em] transition-all duration-300 ${isFormReady && !loading ? "bg-emerald-500 text-white shadow-[0_10px_20px_rgba(16,185,129,0.4)] hover:bg-emerald-400 hover:-translate-y-1 active:scale-95 cursor-pointer" : "bg-slate-800 text-slate-600 cursor-not-allowed border-2 border-dashed border-slate-700"}`}
+            >
               {loading ? "Gjenerimi po fillon..." : "Generate AI Posts ✨"}
             </button>
           </div>
