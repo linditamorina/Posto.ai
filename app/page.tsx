@@ -47,6 +47,7 @@ export default function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  // State për modalin e ndihmës
   const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   useEffect(() => {
@@ -141,17 +142,10 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col md:flex-row h-screen bg-slate-950 text-slate-200 font-sans relative overflow-hidden">
       
-      {/* Butoni i Help-it */}
-      <button 
-        onClick={() => setIsHelpOpen(true)}
-        className="fixed bottom-6 right-6 w-12 h-12 bg-slate-900 border border-slate-800 rounded-full flex items-center justify-center hover:border-indigo-500 transition-all group shadow-xl z-50"
-      >
-        <span className="text-indigo-400 group-hover:text-white font-black italic">?</span>
-      </button>
-
+      {/* Modali i Help-it thirret globalisht */}
       <HowToModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
-      {/* --- MOBILE HEADER (Fixed Top) --- */}
+      {/* --- MOBILE HEADER --- */}
       <div className="md:hidden flex items-center justify-between p-5 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 z-[60] shrink-0">
         <h1 className="text-xl font-black text-white uppercase italic tracking-tighter flex items-center gap-2">
           <span className="bg-indigo-600 text-white px-2 py-0.5 rounded-lg not-italic text-[10px] shadow-[0_0_15px_rgba(79,70,229,0.5)]">P.ai</span> 
@@ -162,15 +156,9 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* --- MOBILE OVERLAY --- */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[70] md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
-      )}
-
       {/* --- SIDEBAR NAVIGATION --- */}
       <aside className={`fixed md:relative z-[80] top-0 left-0 h-full w-[280px] md:w-[320px] bg-slate-900 md:bg-slate-900/50 border-r border-slate-800/50 flex flex-col shadow-[25px_0_50px_rgba(0,0,0,0.4)] shrink-0 transition-transform duration-300 backdrop-blur-xl md:backdrop-blur-md ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         
-        {/* Sidebar Header */}
         <div className="p-6 md:p-8 border-b border-slate-800/50 bg-slate-900/30 flex justify-between items-center shrink-0">
           <h1 className="text-xl md:text-2xl font-black text-white uppercase italic tracking-tighter flex items-center justify-center gap-2">
             <span className="bg-indigo-600 text-white px-2.5 py-1 rounded-xl not-italic text-xs shadow-[0_0_20px_rgba(79,70,229,0.5)]">P.ai</span> 
@@ -179,9 +167,7 @@ export default function Dashboard() {
           <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-slate-400 hover:text-white p-2">✕</button>
         </div>
         
-        {/* Sidebar Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 no-scrollbar flex flex-col">
-          {/* User Profile */}
           <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 bg-slate-800/40 rounded-[20px] border border-slate-700/50 shadow-inner">
             <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-black text-xs md:text-sm shrink-0">
               {user.email?.charAt(0).toUpperCase()}
@@ -192,7 +178,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Nav Buttons */}
           <nav className="flex flex-col gap-2.5">
             <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] ml-2 mb-1">Navigation</p>
             <button onClick={() => { router.push('/generate'); setIsMobileMenuOpen(false); }} className="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-black text-[9px] uppercase tracking-widest transition-all hover:-translate-y-1">✨ CREATE POSTS</button>
@@ -203,9 +188,21 @@ export default function Dashboard() {
             <button onClick={() => { router.push('/text-to-image'); setIsMobileMenuOpen(false); }} className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-black text-[9px] uppercase tracking-[0.2em] transition-all">🎨 TEXT TO IMAGE</button>
           </nav>
 
-          {/* Logout Section - Locked to bottom of scroll area */}
-          <div className="pt-6 mt-auto">
-            <button onClick={handleLogout} className="w-full py-3.5 bg-red-500/5 border border-red-500/10 rounded-xl text-[9px] font-black text-red-500 uppercase tracking-[0.3em] hover:bg-red-500 hover:text-white transition-all italic flex items-center justify-center gap-2">LOGOUT 👋</button>
+          {/* INTEGRIMI I HELP DHE LOGOUT */}
+          <div className="pt-6 mt-auto space-y-2">
+            <button 
+              onClick={() => { setIsHelpOpen(true); setIsMobileMenuOpen(false); }} 
+              className="w-full py-3.5 bg-slate-800/50 border border-slate-700/30 rounded-xl text-[9px] font-black text-indigo-400 uppercase tracking-[0.3em] hover:bg-indigo-600 hover:text-white transition-all italic flex items-center justify-center gap-2"
+            >
+              HOW TO USE 💡
+            </button>
+            
+            <button 
+              onClick={handleLogout} 
+              className="w-full py-3.5 bg-red-500/5 border border-red-500/10 rounded-xl text-[9px] font-black text-red-500 uppercase tracking-[0.3em] hover:bg-red-500 hover:text-white transition-all italic flex items-center justify-center gap-2"
+            >
+              LOGOUT 👋
+            </button>
           </div>
         </div>
       </aside>
@@ -221,7 +218,6 @@ export default function Dashboard() {
               </div>
           </header>
           
-          {/* Metrics Section */}
           <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
             <div className="lg:col-span-2 bg-slate-900/50 border border-slate-800/50 p-6 md:p-10 rounded-[30px] md:rounded-[45px] shadow-2xl flex flex-col h-[300px] md:h-[380px] backdrop-blur-sm">
               <div className="flex justify-between items-center mb-6 md:mb-8 shrink-0">
@@ -250,7 +246,6 @@ export default function Dashboard() {
             </div>
           </section>
 
-          {/* Calendar Section */}
           <section className="bg-slate-900/50 border border-slate-800/50 p-4 sm:p-6 md:p-8 rounded-[30px] md:rounded-[40px] backdrop-blur-sm shadow-2xl overflow-hidden min-h-[500px] md:min-h-[650px] flex flex-col">
             <div className="flex justify-between items-center mb-4 md:mb-6 px-2 shrink-0">
               <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-slate-500">
@@ -276,17 +271,15 @@ export default function Dashboard() {
                   showMore: (total) => `+${total} Posts`,
                 }}
                 popup={false}
-              />
+                />
             </div>
         </section>
 
-          {/* Recent Intelligence List */}
           <section className="pt-4 md:pt-6 pb-10 md:pb-20">
               <div className="flex justify-between items-center mb-6 md:mb-8 px-2 md:px-4">
                   <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-slate-500 border-b-2 md:border-b-4 border-indigo-900/30 pb-2">Recent Intelligence</h3>
               </div>
 
-              {/* Desktop View */}
               <div className="hidden md:block bg-slate-900/50 rounded-[40px] border border-slate-800/50 shadow-2xl overflow-hidden backdrop-blur-sm">
                   <div className="grid grid-cols-5 p-7 bg-slate-900 border-b border-slate-800 font-black text-slate-500 uppercase text-[10px] tracking-widest text-center">
                       <div className="text-left pl-6">Client</div>
@@ -316,7 +309,6 @@ export default function Dashboard() {
                   </div>
               </div>
 
-              {/* Mobile View */}
               <div className="md:hidden space-y-4">
                   {recentPosts.map((post) => (
                       <div key={post.id} className="bg-slate-900/60 border border-slate-800 p-5 rounded-[25px] space-y-4 shadow-xl">
@@ -438,11 +430,9 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* --- GLOBAL STYLES --- */}
       <style jsx global>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
         .custom-calendar-style { color: #94a3b8; font-family: inherit; height: 100% !important; min-height: 500px; }
         .custom-calendar-style .rbc-month-view { border: 1px solid #1e293b; background: #0f172a; border-radius: 20px; overflow: hidden; }
         .custom-calendar-style .rbc-header { padding: 10px; font-weight: 900; text-transform: uppercase; font-size: 10px; color: #64748b; border-bottom: 1px solid #1e293b; }
@@ -450,7 +440,6 @@ export default function Dashboard() {
         .custom-calendar-style .rbc-month-row { border-top: 1px solid #1e293b; }
         .custom-calendar-style .rbc-today { background: rgba(79, 70, 229, 0.15) !important; }
         .rbc-off-range-bg { background: #070b14 !important; }
-
         .custom-calendar-style .rbc-show-more {
           background: #4f46e5 !important;
           color: white !important;
@@ -469,7 +458,6 @@ export default function Dashboard() {
           transition: all 0.2s ease !important;
           border: none !important;
         }
-
         .custom-calendar-style .rbc-event {
           background: rgba(79, 70, 229, 0.1) !important;
           border-left: 3px solid #4f46e5 !important;
@@ -478,15 +466,9 @@ export default function Dashboard() {
           padding: 0 !important;
           height: 22px !important;
         }
-
         @media (max-width: 768px) {
-          .custom-calendar-style .rbc-show-more {
-            font-size: 7px !important;
-            padding: 3px 4px !important;
-          }
-          .custom-calendar-style .rbc-event {
-            height: 18px !important;
-          }
+          .custom-calendar-style .rbc-show-more { font-size: 7px !important; padding: 3px 4px !important; }
+          .custom-calendar-style .rbc-event { height: 18px !important; }
         }
       `}</style>
     </div>

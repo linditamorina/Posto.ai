@@ -62,6 +62,11 @@ export default function HowToModal({ isOpen, onClose }: { isOpen: boolean; onClo
     }
   };
 
+  const handleClose = () => {
+    onClose();
+    setTimeout(() => setCurrentStep(0), 300); // Resetojmë hapin pas mbylljes
+  };
+
   if (!isOpen) return null;
 
   const activeContent = content[lang];
@@ -71,8 +76,17 @@ export default function HowToModal({ isOpen, onClose }: { isOpen: boolean; onClo
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-300">
       <div className="bg-slate-900 border border-slate-800/60 w-full max-w-lg rounded-[40px] overflow-hidden shadow-2xl relative">
         
+        {/* Exit Button (X) */}
+        <button 
+          onClick={handleClose}
+          className="absolute top-8 left-8 w-8 h-8 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700 text-slate-400 hover:text-white hover:bg-red-500/20 hover:border-red-500/50 transition-all z-10"
+          aria-label="Close"
+        >
+          <span className="text-sm font-black">✕</span>
+        </button>
+
         {/* Language Toggle */}
-        <div className="absolute top-8 right-8 flex gap-2">
+        <div className="absolute top-8 right-8 flex gap-2 z-10">
           {['sq', 'en'].map((l) => (
             <button
               key={l}
@@ -126,7 +140,7 @@ export default function HowToModal({ isOpen, onClose }: { isOpen: boolean; onClo
             <button 
               onClick={() => {
                 if (currentStep < activeContent.steps.length - 1) setCurrentStep(prev => prev + 1);
-                else { onClose(); setCurrentStep(0); }
+                else { handleClose(); }
               }}
               className="flex-1 bg-white text-slate-950 p-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-lg italic"
             >
