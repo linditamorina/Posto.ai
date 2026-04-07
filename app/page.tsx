@@ -8,6 +8,7 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import PdfButton from "../app/components/PdfButton";
+import HowToModal from "./components/HowToModal";
 
 const localizer = momentLocalizer(moment);
 
@@ -45,6 +46,8 @@ export default function Dashboard() {
   const [deleteTarget, setDeleteTarget] = useState<{id: string, name: string} | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -138,6 +141,16 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col md:flex-row h-screen bg-slate-950 text-slate-200 font-sans relative overflow-hidden">
       
+      {/* Butoni i Help-it */}
+      <button 
+        onClick={() => setIsHelpOpen(true)}
+        className="fixed bottom-6 right-6 w-12 h-12 bg-slate-900 border border-slate-800 rounded-full flex items-center justify-center hover:border-indigo-500 transition-all group shadow-xl z-50"
+      >
+        <span className="text-indigo-400 group-hover:text-white font-black italic">?</span>
+      </button>
+
+      <HowToModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+
       {/* --- MOBILE HEADER (Fixed Top) --- */}
       <div className="md:hidden flex items-center justify-between p-5 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 z-[60] shrink-0">
         <h1 className="text-xl font-black text-white uppercase italic tracking-tighter flex items-center gap-2">
