@@ -10,22 +10,32 @@ export default function HowToModal({ isOpen, onClose }: { isOpen: boolean; onClo
       steps: [
         {
           title: "Ekosistemi Posto.ai",
-          description: "Një platformë Workspace e integruar që përdor Inteligjencën Artificiale për të transformuar idetë në strategji reale. Sistemi menaxhon gjenerimin e përmbajtjes, analizat e të dhënave dhe rrjedhën e punës në një vend të vetëm.",
+          description: "Një platformë Workspace e integruar që përdor Inteligjencën Artificiale për të transformuar idetë në strategji reale.",
           icon: "🚀"
         },
         {
+          title: "Text to Image (AI Art)",
+          description: "Shndërroni përshkrimet tuaja në vizuale mahnitëse. Shkruani një 'prompt' të detajuar dhe AI do të gjenerojë imazhe unike për postimet tuaja, duke eliminuar nevojën për foto stock.",
+          icon: "🎨"
+        },
+        {
+          title: "Image to Text (Vision)",
+          description: "Ngarkoni një imazh dhe AI do ta analizojë atë. Sistemi mund të nxjerrë përshkrime, të kuptojë kontekstin vizual ose të gjenerojë mbishkrime (captions) bazuar direkt në përmbajtjen e fotos.",
+          icon: "👁️"
+        },
+        {
           title: "Gjenerimi me AI",
-          description: "Përdorni fuqinë e AI për të krijuar tekste origjinale. Ju mund të specifikoni kontekstin dhe tonin e zërit, ndërsa sistemi përshtat modelin gjuhësor për të prodhuar rezultate unike që nuk përsëriten.",
+          description: "Përdorni fuqinë e AI për të krijuar tekste origjinale. Ju mund të specifikoni kontekstin dhe tonin e zërit për rezultate unike.",
           icon: "🧠"
         },
         {
           title: "Hierarkia e Roleve",
-          description: "Siguria është prioritet. Adminët kanë qasje të plotë në menaxhimin e përdoruesve dhe kontrollin e stokut, ndërsa User-at fokusohen në ndryshimet operative, duke siguruar një strukturë të pastër biznesi.",
+          description: "Adminët menaxhojnë përdoruesit dhe stokun, ndërsa User-at fokusohen në operacione, duke siguruar strukturë të pastër.",
           icon: "🛡️"
         },
         {
           title: "Vault & Sinkronizimi",
-          description: "Çdo gjenerim dhe ndryshim ruhet në 'Vault'. Falë integrimit me Supabase, të dhënat tuaja janë të mbrojtura me enkriptim dhe janë të aksesueshme në kohë reale nga çdo pajisje ku jeni të identifikuar.",
+          description: "Çdo gjenerim ruhet në 'Vault' me enkriptim via Supabase, i aksesueshëm në kohë reale nga çdo pajisje.",
           icon: "🔒"
         }
       ],
@@ -37,22 +47,32 @@ export default function HowToModal({ isOpen, onClose }: { isOpen: boolean; onClo
       steps: [
         {
           title: "Posto.ai Ecosystem",
-          description: "An integrated Workspace platform that uses Artificial Intelligence to transform ideas into real strategies. The system manages content generation, data analysis, and workflow in one single place.",
+          description: "An integrated Workspace platform that uses AI to transform ideas into real-world marketing strategies.",
           icon: "🚀"
         },
         {
+          title: "Text to Image (AI Art)",
+          description: "Turn your descriptions into stunning visuals. Enter a detailed prompt and the AI will generate unique images, removing the need for generic stock photos.",
+          icon: "🎨"
+        },
+        {
+          title: "Image to Text (Vision)",
+          description: "Upload an image and let the AI analyze it. The system can extract descriptions, understand visual context, or generate captions based on the photo.",
+          icon: "👁️"
+        },
+        {
           title: "AI Generation",
-          description: "Use the power of AI to create original content. You can specify context and tone of voice, while the system adapts the language model to produce unique, non-repetitive results.",
+          description: "Leverage AI to create original text. Specify context and tone of voice for tailored, non-repetitive results.",
           icon: "🧠"
         },
         {
           title: "Role Hierarchy",
-          description: "Security is a priority. Admins have full access to user management and stock control, while Users focus on operational changes, ensuring a clean business structure.",
+          description: "Admins manage users and stock, while Users focus on operations, ensuring a clean and secure business structure.",
           icon: "🛡️"
         },
         {
           title: "Vault & Sync",
-          description: "Every generation and change is stored in the 'Vault'. Thanks to Supabase integration, your data is protected with encryption and accessible in real-time from any authenticated device.",
+          description: "Every generation is secured in the 'Vault' via Supabase encryption, accessible in real-time across all devices.",
           icon: "🔒"
         }
       ],
@@ -64,7 +84,7 @@ export default function HowToModal({ isOpen, onClose }: { isOpen: boolean; onClo
 
   const handleClose = () => {
     onClose();
-    setTimeout(() => setCurrentStep(0), 300); // Resetojmë hapin pas mbylljes
+    setTimeout(() => setCurrentStep(0), 300);
   };
 
   if (!isOpen) return null;
@@ -76,11 +96,10 @@ export default function HowToModal({ isOpen, onClose }: { isOpen: boolean; onClo
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-300">
       <div className="bg-slate-900 border border-slate-800/60 w-full max-w-lg rounded-[40px] overflow-hidden shadow-2xl relative">
         
-        {/* Exit Button (X) */}
+        {/* Exit Button */}
         <button 
           onClick={handleClose}
           className="absolute top-8 left-8 w-8 h-8 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700 text-slate-400 hover:text-white hover:bg-red-500/20 hover:border-red-500/50 transition-all z-10"
-          aria-label="Close"
         >
           <span className="text-sm font-black">✕</span>
         </button>
@@ -99,14 +118,12 @@ export default function HowToModal({ isOpen, onClose }: { isOpen: boolean; onClo
         </div>
 
         <div className="p-10">
-          {/* Visual Icon */}
           <div className="flex justify-center mb-8">
             <div className="w-20 h-20 bg-indigo-500/10 rounded-3xl flex items-center justify-center text-4xl shadow-inner border border-indigo-500/20 animate-pulse">
               {step.icon}
             </div>
           </div>
 
-          {/* Text Content */}
           <div className="text-center space-y-4 min-h-[160px]">
             <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">
               {step.title}
@@ -116,7 +133,7 @@ export default function HowToModal({ isOpen, onClose }: { isOpen: boolean; onClo
             </p>
           </div>
 
-          {/* Progress Indicators */}
+          {/* Progress */}
           <div className="flex justify-center gap-1.5 mt-10">
             {activeContent.steps.map((_, i) => (
               <div 
@@ -126,7 +143,7 @@ export default function HowToModal({ isOpen, onClose }: { isOpen: boolean; onClo
             ))}
           </div>
 
-          {/* Navigation Buttons */}
+          {/* Navigation */}
           <div className="flex gap-3 mt-8">
             {currentStep > 0 && (
               <button 
