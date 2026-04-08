@@ -73,7 +73,8 @@ export default function VisionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F1A] text-slate-200 p-4 sm:p-6 md:p-10 font-sans selection:bg-indigo-500/30">
+    /* Shtuar 'overflow-x-hidden' për të parandaluar scroll-in horizontal të panevojshëm */
+    <div className="min-h-screen bg-[#0B0F1A] text-slate-200 p-4 sm:p-6 md:p-10 font-sans selection:bg-indigo-500/30 overflow-x-hidden">
       
       {/* Subtle Background Elements */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-indigo-600/10 blur-[120px] pointer-events-none"></div>
@@ -125,8 +126,9 @@ export default function VisionPage() {
 
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Context Analysis</label>
+                {/* 'resize-none' ishte prezent, shtuar 'overflow-hidden' nëse dëshiron që kutia të mos shfaqë scrollbar kur mbushet (opsionale) */}
                 <textarea 
-                  className="w-full bg-[#0B0F1A] border border-slate-800 p-4 rounded-2xl outline-none focus:border-indigo-500/50 text-sm font-bold transition-all min-h-[120px] resize-none placeholder:text-slate-700" 
+                  className="w-full bg-[#0B0F1A] border border-slate-800 p-4 rounded-2xl outline-none focus:border-indigo-500/50 text-sm font-bold transition-all min-h-[120px] resize-none placeholder:text-slate-700 scrollbar-hide" 
                   placeholder="What are we promoting? (Albanian or English)" 
                   value={businessDescription} 
                   onChange={e => setBusinessDescription(e.target.value)} 

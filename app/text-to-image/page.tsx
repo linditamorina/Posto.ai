@@ -49,11 +49,12 @@ export default function TextToImage() {
     setGeneratedImage(null);
     setGeneratedContent(null);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
       const fullPrompt = `${prompt}, ${selectedStyle.suffix}`;
       const response = await fetch("/api/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: fullPrompt }),
+        body: JSON.stringify({ prompt: fullPrompt, userId: user?.id }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Generation failed.");
