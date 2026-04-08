@@ -60,7 +60,7 @@ export default function TextToImage() {
       if (data.url) {
         setProgress(100);
         setGeneratedImage(data.url);
-        setShowContentPrompt(true); // Show question after generation
+        setShowContentPrompt(true);
       }
     } catch (err: any) {
       setError(err.message);
@@ -72,6 +72,7 @@ export default function TextToImage() {
   const handleGenerateContent = async () => {
     setShowContentPrompt(false);
     setIsGeneratingContent(true);
+    setError(null);
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
@@ -80,15 +81,15 @@ export default function TextToImage() {
           businessDescription: prompt, 
           selectedImage: generatedImage,
           numPosts: 3,
-          language: "en" // Set to English
+          language: "en"
         }),
       });
       const result = await response.json();
-      if (result.data) {
-        setGeneratedContent(result.data);
-      }
-    } catch (err) {
+      if (!response.ok) throw new Error(result.error || "Failed to generate copy.");
+      if (result.data) setGeneratedContent(result.data);
+    } catch (err: any) {
       console.error("Error generating content:", err);
+      setError(err.message);
     } finally {
       setIsGeneratingContent(false);
     }
@@ -118,6 +119,7 @@ export default function TextToImage() {
       setShowSuccessModal(true);
     } catch (err: any) {
       console.error(err.message);
+      setError(err.message);
     } finally {
       setIsSaving(false);
     }
@@ -205,6 +207,16 @@ export default function TextToImage() {
                 />
               </div>
 
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-2xl flex items-start gap-3 animate-in fade-in zoom-in duration-300">
+                  <span className="text-red-500 text-base mt-0.5">⚠️</span>
+                  <div>
+                    <h4 className="text-red-500 font-black text-[9px] uppercase tracking-widest">Error Encountered</h4>
+                    <p className="text-red-400/90 text-xs mt-1 italic">{error}</p>
+                  </div>
+                </div>
+              )}
+
               <button 
                 onClick={handleGenerate}
                 disabled={isGenerating || !prompt}
@@ -216,7 +228,8 @@ export default function TextToImage() {
           </div>
 
           <div className="lg:col-span-7 space-y-6">
-            <div className="bg-slate-900/20 border-2 border-dashed border-slate-800/50 rounded-[50px] aspect-square flex items-center justify-center relative overflow-hidden group shadow-2xl">
+            {/* NDRYSHIMI KRYESOR: Dinamika e lartësisë */}
+            <div className={`bg-slate-900/20 border-2 border-dashed border-slate-800/50 rounded-[50px] flex items-center justify-center relative overflow-hidden group shadow-2xl transition-all duration-500 ${generatedImage || isGenerating ? 'aspect-square' : 'h-[300px] lg:h-[450px]'}`}>
               {generatedImage ? (
                 <>
                   <img src={generatedImage} alt="AI Art" className="w-full h-full object-cover animate-in fade-in zoom-in duration-1000" />
@@ -244,7 +257,7 @@ export default function TextToImage() {
                 </div>
               ) : (
                 <div className="text-center space-y-4">
-                    <div className="w-20 h-20 bg-slate-800/20 rounded-full flex items-center justify-center mx-auto border border-slate-800/50">
+                    <div className="w-20 h-20 bg-slate-800/20 rounded-full flex items-center justify-center mx-auto border border-slate-800/50 transition-transform hover:scale-110 duration-300">
                         <span className="text-3xl grayscale opacity-30">🎨</span>
                     </div>
                     <p className="text-[10px] font-black uppercase text-slate-600 tracking-[0.4em]">Ready to create</p>

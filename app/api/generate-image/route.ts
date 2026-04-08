@@ -25,6 +25,7 @@ export async function POST(req: Request) {
     } catch (err) {
       console.error("Translation error:", err);
     }
+    // stabilityai/stable-diffusion-2-1
 
     // HAPI 2: Gjenerimi me modelin FLUX (më i shpejti dhe i sakti për momentin)
     const response = await fetch(
