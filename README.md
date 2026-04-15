@@ -1,46 +1,99 @@
-# 🚀 AI Content Generator - Posto.AI
+# PostoAI - AI Content Generator
 
-Ky është një aplikacion modern i ndërtuar me **Next.js 14**, i cili ndihmon bizneset të gjenerojnë strategji përmbajtjeje dhe postime për rrjetet sociale duke përdorur Inteligjencën Artificiale.
+**PostoAI** is a high-performance, full-stack application designed to automate marketing strategy and visual asset creation. It leverages advanced AI models to provide businesses with data-driven social media plans and high-quality imagery in seconds.
 
-## 🔗 Linku Live (Vercel)
-Kliko butonin më poshtë për të vizituar aplikacionin:
-👉 **[Vizito Aplikacionin Live](https://posto-ai-nine.vercel.app/)**
+## Features
+
+- **AI Marketing Strategy**: Generates detailed content plans including hooks, captions, CTAs, and hashtags using the Llama-3.3-70b model.
+    
+- **Vision-Powered Analysis**: Uses AI to analyze uploaded business photos and generate relevant marketing context.
+    
+- **AI Image Generation**: Integrated Stable Diffusion v1.5 for creating professional-grade visual content via Hugging Face.
+    
+- **Real-time Activity Logging**: Comprehensive tracking of all user generations and activities stored in Supabase.
+    
+- **Credit & Limit System**: Built-in usage management that tracks generation counts and applies a 5-generation free tier.
+    
+- **Optimized UX**: Features human-readable error handling, dynamic loading states, and double-click prevention for a seamless experience.
+    
 
 ---
 
-## ✨ Karakteristikat Kryesore
-* **Gjenerimi me AI:** Krijimi i postimeve automatike bazuar në emrin e biznesit, industrinë dhe tonin e zërit.
-* **Sistemi i Autentikimit:** Logimi i sigurt përmes Supabase Auth.
-* **Vault (Të preferuarat):** Ruajtja e strategjive më të mira në një arkivë personale.
-* **Eksportimi në PDF:** Mundësia për të shkarkuar planet e përmbajtjes si dokumente PDF.
-* **Dizajni Responsive:** UI i optimizuar për Mobile, Tablet dhe Desktop me një estetikë "Modern Dark".
+## Getting Started
 
-## 🛠 Teknologjitë e Përdorura
-* **Framework:** [Next.js](https://nextjs.org/) (App Router)
-* **Stilimi:** [Tailwind CSS](https://tailwindcss.com/)
-* **Database & Auth:** [Supabase](https://supabase.com/)
-* **AI SDK:** Vercel AI SDK / OpenAI
-* **Deployment:** [Vercel](https://vercel.com/)
-* **Librari të tjera:** Moment.js, Framer Motion (nëse e ke përdorur), Lucide React.
+### Prerequisites
 
-## 🚀 Si të ekzekutohet lokalisht
+- **Node.js** (v18.0.0 or higher)
+    
+- **npm** or **yarn**
+    
+- **Supabase** project account
+    
+- **Groq Cloud** API key
+    
+- **Hugging Face** access token
+    
 
-1. Klono projektin:
-   ```bash
-   git clone (https://github.com/linditamorina/Posto.ai)
-Instalo dependecies:
+### Local Setup
 
-Bash
-npm install
-Konfiguro .env.local me çelësat e Supabase dhe OpenAI:
+1. **Clone the Repository:**
+    
+    Bash
+    
+    ```
+    git clone https://github.com/yourusername/posto-ai.git
+    cd posto-ai
+    ```
+    
+2. **Install Dependencies:**
+    
+    Bash
+    
+    ```
+    npm install
+    ```
+    
+1. **Configure Environment Variables:** Create a `.env.local` file in the root directory and add the required keys 
+    
+2. **Database Setup:** Run the provided SQL scripts in your Supabase SQL Editor to initialize the `profiles` and `user_activities` tables, and the `increment_generation_count` RPC function.
+    
+3. **Run the App:**
+    
+    Bash
+    
+    ```
+    npm run dev
+    ```
+    
+    Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000) in your browser.
+    
+
+---
+
+## Environment Variables
+
+The application requires the following environment variables to communicate with the database and AI services:
 
 Code snippet
-NEXT_PUBLIC_SUPABASE_URL=lidhja_juaj
-NEXT_PUBLIC_SUPABASE_ANON_KEY=celes_juaj
-OPENAI_API_KEY=celes_juaj
-Starto serverin:
 
-Bash
-npm run dev
-👤 Autori
-Lindita Morina
+```
+# Supabase Configuration
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# AI Service Tokens
+HUGGINGFACE_TOKEN=your_huggingface_access_token
+GROQ_API_KEY=your_groq_cloud_api_key
+```
+
+---
+
+## Live Deployment
+
+The project is live and can be accessed at:
+
+👉 **[PostoAI Live Link](https://posto-ai-nine.vercel.app/)**
+
+---
+
+_Developed by Lindita Morina as a final-year project for Computer Science and Engineering at “Isa Boletini” University._
