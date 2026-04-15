@@ -47,8 +47,24 @@ export default function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // State për modalin e ndihmës
+  // State për modalin e ndihmës dhe statusin e rrjetit
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
+
+  // Kontrolluesi i Rrjetit (Offline State Listener)
+  useEffect(() => {
+    setIsOffline(!navigator.onLine);
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -142,6 +158,24 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col md:flex-row h-screen bg-slate-950 text-slate-200 font-sans relative overflow-hidden">
       
+      {/* --- OFFLINE OVERLAY --- */}
+      {isOffline && (
+        <div className="fixed inset-0 z-[9999] bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500">
+          <div className="w-24 h-24 bg-slate-900/80 rounded-full flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(79,70,229,0.3)] border border-indigo-500/20 animate-pulse">
+              <span className="text-4xl opacity-80 grayscale">📡</span>
+          </div>
+          <h2 className="text-2xl md:text-4xl font-black text-white uppercase italic tracking-tighter mb-3 text-center">Connection Lost</h2>
+          <p className="text-slate-500 font-black text-[10px] md:text-xs uppercase tracking-[0.4em] text-center max-w-sm leading-relaxed">
+              Neural sync interrupted.<br/>Waiting for network signal...
+          </p>
+          <div className="mt-12 flex gap-3">
+              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-ping"></div>
+              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-ping" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-ping" style={{ animationDelay: '0.4s' }}></div>
+          </div>
+        </div>
+      )}
+
       {/* Modali i Help-it thirret globalisht */}
       <HowToModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
