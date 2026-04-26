@@ -3,184 +3,134 @@ import { createClient } from "@supabase/supabase-js";
 // @ts-ignore
 import translate from "translate";
 
-// export async function POST(req: Request) {
-//   try {
-//     const { prompt, userId } = await req.json();
-//     const token = process.env.HUGGINGFACE_TOKEN;
-    
-//     const supabaseUrl = process.env.SUPABASE_URL;
-//     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Modeli SDXL ofron kualitetin më të lartë dhe realist aktualisht në HF falas
+const MODEL_ID = "stabilityai/stable-diffusion-xl-base-1.0";
 
-//     if (!supabaseUrl || !supabaseKey) {
-//       return NextResponse.json({ error: "Konfigurimi i serverit dështoi (ENV missing)." }, { status: 500 });
-//     }
-
-//     if (!token) {
-//       return NextResponse.json({ error: "Token i Hugging Face mungon." }, { status: 500 });
-//     }
-
-//     if (!userId) {
-//       return NextResponse.json({ error: "Përdoruesi i paidentifikuar." }, { status: 401 });
-//     }
-
-//     const supabase = createClient(supabaseUrl, supabaseKey);
-
-//     // 1. KONTROLLI I LIMITIT (Database Check)
-//     const { data: profile, error: profileError } = await supabase
-//       .from("profiles")
-//       .select("generations_count")
-//       .eq("id", userId)
-//       .single();
-
-//     if (profile && profile.generations_count >= 5) {
-//       return NextResponse.json(
-//         { error: "Keni arritur limitin tuaj personal prej 5 gjenerimesh falas." },
-//         { status: 429 }
-//       );
-//     }
-
-//     // 2. PËRKTHIMI I PROMPT-IT (SQ -> EN)
-//     let translatedPrompt = prompt;
-//     try {
-//       const translateLib = translate as any;
-//       translateLib.engine = "google";
-//       translatedPrompt = await translateLib(prompt, { from: "sq", to: "en" });
-//     } catch (err) {
-//       console.error("Translation error:", err);
-//     }
-
-//     // 3. GJENERIMI I IMAZHIT (Hugging Face)
-//     const response = await fetch(
-//       "https://router.huggingface.co/hf-inference/models/runwayml/stable-diffusion-v1-5",
-//       {
-//         headers: {
-//           "Authorization": `Bearer ${token}`,
-//           "Content-Type": "application/json",
-//           "x-wait-for-model": "true",
-//         },
-//         method: "POST",
-//         body: JSON.stringify({
-//           inputs: translatedPrompt,
-//           parameters: {
-//             guidance_scale: 7.5,
-//             num_inference_steps: 4,
-//           }
-//         }),
-//       }
-//     );
-
-//     // 4. CATCH ERROR LOGIC
-//     if (!response.ok) {
-//       const errorData = await response.json().catch(() => ({}));
-//       if (response.status === 429) {
-//         return NextResponse.json(
-//           { error: "Sistemi ka arritur limitin mujor. Provoni përsëri muajin tjetër." },
-//           { status: 429 }
-//         );
-//       }
-//       return NextResponse.json({ error: errorData.error || "Gjenerimi dështoi." }, { status: response.status });
-//     }
-
-//     // 5. SUKSES: RRITJA E NUMËRUESIT DHE LOGIMI I AKTIVITETIT
-//     // Rritim numrin te profiles
-//     await supabase.rpc('increment_generation_count', { user_id: userId });
-
-//     // Regjistrojmë aktivitetin te user_activities
-//     await supabase.from("user_activities").insert([
-//       { 
-//         user_id: userId, 
-//         type: "image_generation", 
-//         description: `Gjeneroi imazhin: ${prompt.substring(0, 50)}...` 
-//       }
-//     ]);
-
-//     const arrayBuffer = await response.arrayBuffer();
-//     const base64Image = Buffer.from(arrayBuffer).toString("base64");
-
-//     return NextResponse.json({
-//       url: `data:image/jpeg;base64,${base64Image}`,
-//     });
-
-//   } catch (error: any) {
-//     console.error("Internal Error:", error);
-//     return NextResponse.json({ error: "Gabim i brendshëm: " + error.message }, { status: 500 });
-//   }
-// }
-
-// Sigurohu që inicializimi i supabase është jashtë POST ose i mbrojtur
 export async function POST(req: Request) {
   try {
     const { prompt, userId } = await req.json();
-    
-    // Kontrolli i variablave (Rregullon image_f48f06.png)
+
+    // 1. Verifikimi i variablave të ambientit
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-       return NextResponse.json({ error: "Mungojnë celsat e Supabase në .env" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Konfigurimi i bazës së të dhënave dështoi." },
+        { status: 500 },
+      );
     }
 
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const hfToken = process.env.HUGGINGFACE_TOKEN; // Lexojmë tokenin nga .env.local
+    if (!hfToken) {
+      return NextResponse.json(
+        { error: "Token i Hugging Face mungon." },
+        { status: 500 },
+      );
+    }
 
-    // 1. Regjistro tentativën (Kjo mbush image_0935c6.png)
-    await supabase.from("user_activities").insert([
-      { user_id: userId, type: "attempt", description: "Tentim për gjenerim imazhi" }
-    ]);
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Përdoruesi i paidentifikuar. Ju lutem lidhuni." },
+        { status: 401 },
+      );
+    }
 
-    // 2. PËKTHIMI I PROMPT-IT (SQ -> EN)
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY,
+    );
+
+    // 2. KONTROLLI I LIMITIT (Rate Limiting)
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("generations_count")
+      .eq("id", userId)
+      .single();
+
+    if (profile && profile.generations_count >= 5) {
+      return NextResponse.json(
+        { error: "Keni arritur limitin prej 5 imazhesh falas." },
+        { status: 429 },
+      );
+    }
+
+    // 3. PËRKTHIMI (Modelet e HF kuptojnë vetëm Anglisht)
     let translatedPrompt = prompt;
     try {
       const translateLib = translate as any;
       translateLib.engine = "google";
       translatedPrompt = await translateLib(prompt, { from: "sq", to: "en" });
     } catch (err) {
-      console.error("Translation error:", err);
-    }
-
-    // 3. GJENERIMI I IMAZHIT (Hugging Face)
-    const token = process.env.HUGGINGFACE_TOKEN;
-    if (!token) {
-      return NextResponse.json({ error: "Token i Hugging Face mungon." }, { status: 500 });
+      console.warn("Përkthimi dështoi, po vazhdojmë me promptin origjinal.");
     }
 
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/runwayml/stable-diffusion-v1-5",
+      `https://api-inference.huggingface.co/models/${MODEL_ID}`,
       {
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${hfToken}`,
           "Content-Type": "application/json",
-          "x-wait-for-model": "true",
+          "x-use-cache": "false",
         },
         method: "POST",
         body: JSON.stringify({
           inputs: translatedPrompt,
           parameters: {
             guidance_scale: 7.5,
-            num_inference_steps: 4,
-          }
+            num_inference_steps: 30, // Më shumë hapa = më shumë detaje realiste
+          },
         }),
-      }
+      },
     );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      return NextResponse.json({ error: errorData.error || "Gjenerimi dështoi." }, { status: response.status });
+
+      // Trajtimi i modelit që po ngarkohet (Cold Start)
+      if (response.status === 503) {
+        return NextResponse.json(
+          {
+            error:
+              "AI po zgjohet (Cold Start). Provo përsëri pas 20 sekondave.",
+          },
+          { status: 503 },
+        );
+      }
+
+      return NextResponse.json(
+        {
+          error: errorData.error || "Hugging Face refuzoi kërkesën.",
+        },
+        { status: response.status },
+      );
     }
 
-    if (response.ok) {
-       // Përditëso profilin
-       await supabase.rpc('increment_generation_count', { user_id: userId });
-       
-       // Log suksesi
-       await supabase.from("user_activities").insert([
-         { user_id: userId, type: "success", description: "Imazhi u gjenerua me sukses" }
-       ]);
-    }
-    
+    // 6. KONVERTIMI I IMAZHIT (Kritike për HF)
+    // Hugging Face na kthen imazhin si "raw binary buffer"
     const arrayBuffer = await response.arrayBuffer();
-    const base64Image = Buffer.from(arrayBuffer).toString("base64");
+    const buffer = Buffer.from(arrayBuffer);
 
-    return NextResponse.json({
-      url: `data:image/jpeg;base64,${base64Image}`,
-    });
+    // E kthejmë në Base64 që frontendi ta lexojë si një link (<img src="data:image/jpeg;base64,...">)
+    const base64Image = buffer.toString("base64");
+    const imageUrl = `data:image/jpeg;base64,${base64Image}`;
+
+    // 7. LOGIMI DHE PËRDITËSIMI NË BAZËN E TË DHËNAVE
+    await supabase.rpc("increment_generation_count", { user_id: userId });
+    await supabase
+      .from("user_activities")
+      .insert([
+        {
+          user_id: userId,
+          type: "success",
+          description: `Gjeneroi imazh: ${prompt.substring(0, 30)}...`,
+        },
+      ]);
+
+    // Kthejmë URL-në Base64 në të njëjtin format që pret Frontendi
+    return NextResponse.json({ url: imageUrl });
   } catch (error: any) {
-    return NextResponse.json({ error: "Gabim i serverit: " + error.message }, { status: 500 });
+    console.error("API Route Error:", error);
+    return NextResponse.json(
+      { error: "Gabim i brendshëm në server: " + error.message },
+      { status: 500 },
+    );
   }
 }
