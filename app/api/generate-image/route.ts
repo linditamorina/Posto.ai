@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin, getUserFromRequest } from "@/lib/supabaseAdmin";
 // @ts-ignore
 import translate from "translate";
 
@@ -8,10 +8,11 @@ const MODEL_ID = "stabilityai/stable-diffusion-xl-base-1.0";
 
 export async function POST(req: Request) {
   try {
-    const { prompt, userId } = await req.json();
+    const { prompt } = await req.json();
 
     // 1. Verifikimi i variablave të ambientit
-    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
       return NextResponse.json(
         { error: "Konfigurimi i bazës së të dhënave dështoi." },
         { status: 500 },
@@ -26,17 +27,15 @@ export async function POST(req: Request) {
       );
     }
 
+    // Përdoruesin e marrim nga sesioni i verifikuar, jo nga trupi i kërkesës
+    const user = await getUserFromRequest(req, supabase);
+    const userId = user?.id;
     if (!userId) {
       return NextResponse.json(
         { error: "Përdoruesi i paidentifikuar. Ju lutem lidhuni." },
         { status: 401 },
       );
     }
-
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY,
-    );
 
     // 2. KONTROLLI I LIMITIT (Rate Limiting)
     const { data: profile } = await supabase
@@ -45,7 +44,7 @@ export async function POST(req: Request) {
       .eq("id", userId)
       .single();
 
-    if (profile && profile.generations_count >= 5) {
+    if ((profile?.generations_count ?? 0) >= 5) {
       return NextResponse.json(
         { error: "Keni arritur limitin prej 5 imazhesh falas." },
         { status: 429 },
@@ -63,7 +62,7 @@ export async function POST(req: Request) {
     }
 
     const response = await fetch(
-      `https://api-inference.huggingface.co/models/${MODEL_ID}`,
+      `https://router.huggingface.co/hf-inference/models/${MODEL_ID}`,
       {
         headers: {
           Authorization: `Bearer ${hfToken}`,

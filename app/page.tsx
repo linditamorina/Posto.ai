@@ -95,7 +95,9 @@ export default function Dashboard() {
       const d = moment().subtract(i, 'days').format('ddd');
       daysMap[d] = 0;
     }
-    allPosts.forEach(post => {
+    // Numërojmë vetëm postimet e 7 ditëve të fundit, jo çdo postim me të njëjtin emër dite
+    const weekStart = moment().subtract(6, 'days').startOf('day');
+    allPosts.filter(post => moment(post.created_at).isSameOrAfter(weekStart)).forEach(post => {
       const postDay = moment(post.created_at).format('ddd');
       if (daysMap[postDay] !== undefined) daysMap[postDay]++;
     });

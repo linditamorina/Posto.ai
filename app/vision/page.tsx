@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { apiFetch } from "@/lib/apiFetch";
 import { useRouter } from "next/navigation";
 import moment from "moment";
 
@@ -23,19 +24,15 @@ export default function VisionPage() {
     if (!selectedImage) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          selectedImage,
-          businessName,
-          location,
-          businessDescription,
-          industry: "Retail/Market",
-          numPosts: 1,
-          tone: "Professional & Modern",
-          language: "sq"
-        }),
+      const res = await apiFetch("/api/generate", {
+        selectedImage,
+        businessName,
+        location,
+        businessDescription,
+        industry: "Retail/Market",
+        numPosts: 1,
+        tone: "Professional & Modern",
+        language: "sq"
       });
 
       const responseData = await res.json();

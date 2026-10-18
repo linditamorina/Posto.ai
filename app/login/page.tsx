@@ -30,7 +30,8 @@ export default function LoginPage() {
             display_name: username,
             generations_count: 0 
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          // Supabase e lexon sesionin nga linku automatikisht, s'ka nevojë për faqe callback
+          emailRedirectTo: `${window.location.origin}/`,
         }
       });
 

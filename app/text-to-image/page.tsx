@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { apiFetch } from "@/lib/apiFetch";
 
 const STYLES = [
   { id: "photo", label: "📸 Realistic", suffix: "ultra-realistic, 8k resolution, cinematic lighting, shot on 35mm lens, highly detailed textures, professional photography" },
@@ -57,14 +58,7 @@ export default function TextToImage() {
       }
 
       const fullPrompt = `${prompt}, ${selectedStyle.suffix}`;
-      const response = await fetch("/api/generate-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          prompt: fullPrompt, 
-          userId: user.id // Sigurohemi që dërgohet ID-ja e saktë
-        }),
-      });
+      const response = await apiFetch("/api/generate-image", { prompt: fullPrompt });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Gjenerimi dështoi.");
@@ -86,17 +80,11 @@ export default function TextToImage() {
     setIsGeneratingContent(true);
     setError(null);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          businessDescription: prompt, 
-          selectedImage: generatedImage,
-          numPosts: 3,
-          language: "en",
-          userId: user?.id, // Rregulluar: Përdorim user?.id nga auth
-        }),
+      const response = await apiFetch("/api/generate", {
+        businessDescription: prompt,
+        selectedImage: generatedImage,
+        numPosts: 3,
+        language: "en",
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Dështoi krijimi i tekstit.");

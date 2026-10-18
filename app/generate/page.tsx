@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { apiFetch } from "@/lib/apiFetch";
 import { useRouter } from "next/navigation";
 import moment from 'moment';
 
@@ -89,11 +90,7 @@ export default function GeneratePage() {
         endDate: dateRange.end 
       };
 
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await apiFetch("/api/generate", payload);
 
       if (!response.ok) {
         const errorText = await response.text();

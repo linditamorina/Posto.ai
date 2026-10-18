@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
 import { Groq } from 'groq-sdk';
-
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+import { getSupabaseAdmin, getUserFromRequest } from '@/lib/supabaseAdmin';
 
 export async function POST(req: Request) {
   try {
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ error: "Konfigurimi i bazës së të dhënave dështoi." }, { status: 500 });
+    }
+    const user = await getUserFromRequest(req, supabase);
+    if (!user) {
+      return NextResponse.json({ error: "Përdoruesi i paidentifikuar. Ju lutem lidhuni." }, { status: 401 });
+    }
+
+    // Klienti krijohet brenda kërkesës që build-i të mos dështojë kur mungon çelësi
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
     const body = await req.json();
     
     // RREGULLIM: Sigurohemi që kapim të dhënat pavarësisht emërtimit në frontend
@@ -38,7 +48,7 @@ export async function POST(req: Request) {
               ]
             }
           ],
-          model: "llama-3.2-11b-vision-preview", 
+          model: "meta-llama/llama-4-scout-17b-16e-instruct", 
         });
         visualContext = visionCompletion.choices[0]?.message?.content || "";
       } catch (e) {
@@ -50,7 +60,7 @@ export async function POST(req: Request) {
     // 2. DINAMIKA E TONIT
     const toneInstruction = tone === "Friendly/Local" 
       ? `Përdor gjuhë miqësore dhe slang të butë të ${location}.` 
-      : "Përdor gjuhë profesionale, bindëse dhe korrekte.";
+      : `Përdor ton "${tone}" me gjuhë bindëse dhe korrekte.`;
 
     // 3. SYSTEM PROMPT (I përmirësuar për saktësi maksimale)
     const systemPrompt = `
@@ -66,7 +76,8 @@ export async function POST(req: Request) {
     1. Krijo saktësisht ${numPosts} postime.
     2. Çdo postim duhet të bazohet në atë që shihet në foto dhe përshkrim.
     3. Gjuha: ${language === 'en' ? 'English' : 'Shqip'}.
-    4. Kthe VETËM JSON.
+    4. Toni: ${toneInstruction}
+    5. Kthe VETËM JSON.
 
     STRUKTURA JSON:
     {
