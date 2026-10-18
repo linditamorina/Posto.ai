@@ -12,6 +12,8 @@
     
 - **Real-time Activity Logging**: Comprehensive tracking of all user generations and activities stored in Supabase.
     
+- **One-Click Publishing**: Connect LinkedIn, Facebook Pages and Instagram Business accounts and publish any generated post in one click. See [docs/social-posting-setup.md](docs/social-posting-setup.md).
+    
 - **Credit & Limit System**: Built-in usage management that tracks generation counts and applies a 5-generation free tier.
     
 - **Optimized UX**: Features human-readable error handling, dynamic loading states, and double-click prevention for a seamless experience.
@@ -55,7 +57,7 @@
     
 1. **Configure Environment Variables:** Create a `.env.local` file in the root directory and add the required keys 
     
-2. **Database Setup:** Run the provided SQL scripts in your Supabase SQL Editor to initialize the `profiles` and `user_activities` tables, and the `increment_generation_count` RPC function.
+2. **Database Setup:** Run the provided SQL scripts in your Supabase SQL Editor to initialize the `profiles` and `user_activities` tables, and the `increment_generation_count` RPC function. For one-click publishing, also run `supabase/migrations/001_social_posting.sql`.
     
 3. **Run the App:**
     
@@ -78,12 +80,21 @@ Code snippet
 
 ```
 # Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 # AI Service Tokens
 HUGGINGFACE_TOKEN=your_huggingface_access_token
 GROQ_API_KEY=your_groq_cloud_api_key
+
+# One-click publishing (see docs/social-posting-setup.md)
+SOCIAL_TOKEN_KEY=base64_32_byte_key
+LINKEDIN_CLIENT_ID=...
+LINKEDIN_CLIENT_SECRET=...
+META_APP_ID=...
+META_APP_SECRET=...
 ```
 
 ---

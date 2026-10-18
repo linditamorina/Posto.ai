@@ -4,6 +4,9 @@ import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import dynamic from "next/dynamic"; // 1. Shto këtë
+import PublishModal from "@/app/components/PublishModal";
+import { PLATFORM_INFO } from "@/app/components/platforms";
+import { composePostText } from "@/lib/social/text";
 
 // 2. Importo butonin në mënyrë dinamike me SSR false
 const PdfButton = dynamic(() => import("@/app/components/PdfButton"), { 
@@ -19,10 +22,25 @@ export default function GenerationDetails() {
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [publishIndex, setPublishIndex] = useState<number | null>(null);
+  const [publications, setPublications] = useState<{ post_index: number; platform: string; external_url: string | null }[]>([]);
 
   useEffect(() => {
-    if (user && id) fetchPost();
+    if (user && id) {
+      fetchPost();
+      fetchPublications();
+    }
   }, [user, id]);
+
+  // Ku është publikuar tashmë secili postim (vetëm ato të suksesshme)
+  const fetchPublications = async () => {
+    const { data } = await supabase
+      .from("post_publications")
+      .select("post_index, platform, external_url")
+      .eq("post_id", String(id))
+      .eq("status", "success");
+    if (data) setPublications(data);
+  };
 
   const fetchPost = async () => {
     try {
@@ -90,6 +108,17 @@ export default function GenerationDetails() {
     <div className="min-h-screen bg-slate-950 p-4 sm:p-6 md:p-16 relative overflow-hidden selection:bg-indigo-500 selection:text-white">
       <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-indigo-600/10 rounded-full blur-[80px] md:blur-[120px] pointer-events-none"></div>
       
+      {publishIndex !== null && post && (
+        <PublishModal
+          postId={String(post.id)}
+          postIndex={publishIndex}
+          defaultText={composePostText(postList[publishIndex] || {})}
+          hasImage={Boolean(post.reference_image)}
+          onClose={() => setPublishIndex(null)}
+          onPublished={fetchPublications}
+        />
+      )}
+
       <div className="max-w-4xl mx-auto relative z-10">
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 md:mb-12 gap-6 sm:gap-4">
           <button 
@@ -136,10 +165,22 @@ export default function GenerationDetails() {
               <div key={idx} className="group bg-slate-800/30 p-6 sm:p-8 md:p-10 rounded-[25px] md:rounded-[40px] border border-slate-700/30 transition-all duration-500 hover:bg-slate-800/50 hover:border-indigo-500/30">
                 <div className="flex justify-between items-center mb-4 md:mb-6">
                   <span className="bg-slate-900 text-indigo-400 px-4 md:px-5 py-1.5 md:py-2 rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest border border-slate-800 shadow-inner">Node #{idx + 1}</span>
+                  <div className="flex items-center gap-2">
+                  <button onClick={() => setPublishIndex(idx)} className="px-4 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl bg-indigo-600 text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-indigo-500 transition-all">🚀 Publish</button>
                   <button onClick={() => copyToClipboard(`${p.hook || ''}\n\n${p.caption || ''}`, `post-${idx}`)} className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-slate-900/80 border border-slate-800 text-slate-500 hover:text-indigo-400 transition-all">
                     {copiedId === `post-${idx}` ? "✓" : <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 md:w-5 md:h-5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>}
                   </button>
+                  </div>
                 </div>
+                {publications.some(pub => pub.post_index === idx) && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {publications.filter(pub => pub.post_index === idx).map((pub, i) => (
+                      <a key={i} href={pub.external_url || undefined} target="_blank" rel="noopener noreferrer" className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-950/30 border border-emerald-900/40 px-3 py-1.5 rounded-full hover:text-emerald-300">
+                        ✓ {PLATFORM_INFO[pub.platform]?.label || pub.platform}
+                      </a>
+                    ))}
+                  </div>
+                )}
                 <h3 className="text-xl sm:text-2xl font-black text-white mb-3 md:mb-4 italic leading-tight tracking-tight">"{p.hook || p.title || "Innovation Insight"}"</h3>
                 <p className="text-slate-400 leading-relaxed font-medium text-base sm:text-lg opacity-90">{p.caption || p.content}</p>
                 
