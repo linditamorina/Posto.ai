@@ -218,6 +218,7 @@ export default function Dashboard() {
             <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] ml-2 mb-1">Navigation</p>
             <button onClick={() => { router.push('/generate'); setIsMobileMenuOpen(false); }} className="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-black text-[9px] uppercase tracking-widest transition-all hover:-translate-y-1">✨ CREATE POSTS</button>
             <button onClick={() => { router.push('/favorites'); setIsMobileMenuOpen(false); }} className="w-full py-3.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all hover:text-white">★ VAULT</button>
+            <button onClick={() => { router.push('/accounts'); setIsMobileMenuOpen(false); }} className="w-full py-3.5 bg-slate-800 text-slate-400 border border-slate-700 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all hover:text-white">🔗 ACCOUNTS</button>
             
             <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] ml-2 mt-4 mb-1">AI Intelligence</p>
             <button onClick={() => { router.push('/vision'); setIsMobileMenuOpen(false); }} className="w-full py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-xl font-black text-[9px] uppercase tracking-[0.2em] transition-all">📸 IMAGE TO TEXT</button>
